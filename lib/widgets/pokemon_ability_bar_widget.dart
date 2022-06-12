@@ -7,21 +7,28 @@ class PokemonAbilityBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 4,
-          width: 100,
-          decoration: const BoxDecoration(
-            color: Colors.grey,
+    return Container(
+      padding: EdgeInsets.only(bottom: 15),
+      child: Stack(
+        children: [
+          Container(
+            height: 4,
+            width: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.all(Radius.circular(10))
+            ),
           ),
-        ),
-        Container(
-          height: 4,
-          width: stat.toDouble(),
-          decoration: const BoxDecoration(color: Colors.lightGreen),
-        )
-      ],
+          Container(
+            height: 4,
+            width: (100 * stat) / 250 ,
+            decoration: const BoxDecoration(
+              color: Colors.lightGreen,
+              borderRadius: BorderRadius.all(Radius.circular(10))
+            ),
+          )
+        ],
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:sprout_app/providers/pokemon_provider.dart';
 import 'package:sprout_app/constants/theme.dart';
@@ -46,11 +47,11 @@ class PokemonGridWidget extends StatelessWidget {
                       PokemonDetailPage(name: pokemonName[index].name)));
             },
             child: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(7),
                 decoration: BoxDecoration(
                     color: getPokemonTypeColor(
                             pokemonDetail[index].type[0].type.name)
-                        .withAlpha(100),
+                        .withAlpha(170),
                     borderRadius: BorderRadius.all(Radius.circular(30))),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +62,14 @@ class PokemonGridWidget extends StatelessWidget {
                         SizedBox(
                           height: sizeVertical * 5,
                         ),
-                        Text(pokemonDetail[index].name),
+                        Text(
+                          pokemonDetail[index].name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: sizeHorizontal * 4,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
                         ...pokemonDetail[index]
                             .type
                             .map((e) => PokemonTypeWidget(type: e.type.name))
@@ -69,8 +77,14 @@ class PokemonGridWidget extends StatelessWidget {
                       ],
                     ),
                     Container(
-                      child:
-                          Image.network(pokemonDetail[index].image, scale: 6),
+                      height: sizeHorizontal * 21,
+                      width: sizeHorizontal * 21,
+                      child: CachedNetworkImage(
+                        imageUrl: pokemonDetail[index].image,
+                        progressIndicatorBuilder: (context, url, progress) => CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      )
+                          // Image.network(pokemonDetail[index].image, scale: 6),
                     )
                   ],
                 )),

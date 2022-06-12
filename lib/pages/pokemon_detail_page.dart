@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:sprout_app/constants/theme.dart';
 import 'package:sprout_app/providers/pokemon_provider.dart';
+import 'package:sprout_app/widgets/pokemon_ability_bar_widget.dart';
 import 'package:sprout_app/widgets/pokemon_ability_widget.dart';
 import 'package:sprout_app/widgets/pokemon_type_widget.dart';
 import 'package:sprout_app/constants/utils.dart';
@@ -24,7 +26,8 @@ class PokemonDetailPage extends StatelessWidget {
         title: Text('Pokemon'),
       ),
       body: Container(
-        color: getPokemonTypeColor(pokemonData.type[0].type.name).withAlpha(100),
+        color:
+            getPokemonTypeColor(pokemonData.type[0].type.name).withAlpha(170),
         child: DefaultTabController(
           length: 2,
           initialIndex: 0,
@@ -35,7 +38,10 @@ class PokemonDetailPage extends StatelessWidget {
                 padding: EdgeInsets.all(10),
                 child: Text(
                   pokemonData.name,
-                  style: TextStyle(fontSize: sizeHorizontal * 9),
+                  style: TextStyle(
+                      fontSize: sizeHorizontal * 9,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               Container(
@@ -49,10 +55,15 @@ class PokemonDetailPage extends StatelessWidget {
                 ),
               ),
               Center(
-                child: Image.network(
-                  pokemonData.image,
-                  scale: 2,
-                ),
+                child: Container(
+                  child: CachedNetworkImage(
+                    height: sizeHorizontal * 65,
+                    width: sizeHorizontal * 65,
+                    imageUrl: pokemonData.image,
+                    progressIndicatorBuilder: (context, url, progress) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+                )
               ),
               Container(
                   padding: EdgeInsets.all(15),
@@ -62,7 +73,7 @@ class PokemonDetailPage extends StatelessWidget {
                           topRight: Radius.circular(40),
                           topLeft: Radius.circular(40))),
                   child: const TabBar(
-                    labelColor: Colors.red,
+                    labelColor: Colors.blue,
                     tabs: [
                       Tab(
                         text: 'About',
@@ -118,10 +129,10 @@ class PokemonDetailPage extends StatelessWidget {
                                 ),
                               ),
                               Row(
-                                children: pokemonData.ability
-                                  .map((e) => PokemonAbilityWidget(ability: e.ability.name))
-                                  .toList()
-                              )
+                                  children: pokemonData.ability
+                                      .map((e) => PokemonAbilityWidget(
+                                          ability: e.ability.name))
+                                      .toList())
                             ],
                           )
                         ],
@@ -136,24 +147,61 @@ class PokemonDetailPage extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Hp', style: TextStyle(fontSize: sizeHorizontal * 4),),
-                                Text('Attack', style: TextStyle(fontSize: sizeHorizontal * 4),),
-                                Text('Defence', style: TextStyle(fontSize: sizeHorizontal * 4),),
-                                Text('Special-attack', style: TextStyle(fontSize: sizeHorizontal * 4),),
-                                Text('Special-defense', style: TextStyle(fontSize: sizeHorizontal * 4),),
-                                Text('Speed', style: TextStyle(fontSize: sizeHorizontal * 4),),
+                                Text(
+                                  'Hp',
+                                  style:
+                                      TextStyle(fontSize: sizeHorizontal * 4),
+                                ),
+                                Text(
+                                  'Attack',
+                                  style:
+                                      TextStyle(fontSize: sizeHorizontal * 4),
+                                ),
+                                Text(
+                                  'Defence',
+                                  style:
+                                      TextStyle(fontSize: sizeHorizontal * 4),
+                                ),
+                                Text(
+                                  'Special-attack',
+                                  style:
+                                      TextStyle(fontSize: sizeHorizontal * 4),
+                                ),
+                                Text(
+                                  'Special-defense',
+                                  style:
+                                      TextStyle(fontSize: sizeHorizontal * 4),
+                                ),
+                                Text(
+                                  'Speed',
+                                  style:
+                                      TextStyle(fontSize: sizeHorizontal * 4),
+                                ),
                               ],
                             ),
-                            Column(
-                              children: pokemonData.stat
-                                  .map((e) => Text(e.baseStat.toString(), style: TextStyle(fontSize: sizeHorizontal * 4),))
-                                  .toList(),
-                            ),
-                            // Column(
-                            //   children: pokemonData.stat
-                            //       .map((e) => PokemonAbilityBarWidget(stat: e.baseStat))
-                            //       .toList(),
-                            // )
+                            Row(
+                              children: [
+                                Column(
+                                  children: pokemonData.stat
+                                      .map((e) => Text(
+                                            e.baseStat.toString(),
+                                            style: TextStyle(
+                                                fontSize: sizeHorizontal * 4),
+                                          ))
+                                      .toList(),
+                                ),
+                                SizedBox(width: sizeHorizontal * 3,),
+                                Column(children: [
+                                  SizedBox(
+                                    height: sizeHorizontal * 1.5,
+                                  ),
+                                  ...pokemonData.stat
+                                      .map((e) => PokemonAbilityBarWidget(
+                                          stat: e.baseStat))
+                                      .toList()
+                                ])
+                              ],
+                            )
                           ],
                         )),
                   ],

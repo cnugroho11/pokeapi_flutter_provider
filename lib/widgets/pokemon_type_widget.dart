@@ -19,7 +19,14 @@ class PokemonTypeWidget extends StatelessWidget {
         color: getPokemonTypeColor(type),
         borderRadius: BorderRadius.all(Radius.circular(10))
       ),
-      child: Center(child: Text(type)),
+      child: Center(
+        child: Text(
+          type,
+          style: TextStyle(
+            color: Colors.white
+          ),
+        )
+      ),
     );
   }
 }
