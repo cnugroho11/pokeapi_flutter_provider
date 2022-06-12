@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:sprout_app/models/pokemon_model.dart';
 import 'package:sprout_app/models/pokemon_name_model.dart';
 
-class PokemonProvider extends ChangeNotifier{
+class PokemonProvider extends ChangeNotifier {
   List<Pokemon> _pokemons = [];
   List<Pokemon> get pokemons => _pokemons;
 
@@ -15,32 +15,37 @@ class PokemonProvider extends ChangeNotifier{
   String _nextUrls = '';
   String get nextUrls => _nextUrls;
 
-  PokemonProvider(){
+  bool _isFetching = false;
+  bool get isFetching => _isFetching;
+
+  PokemonProvider() {
     init();
   }
 
   init() async {
-    try{
+    try {
       await getPokemonName();
-      await getPokemonDetail();
+      await getFirstPokemonDetail();
       await getNextUrl();
-    } catch(e) {
+    } catch (e) {
       print(e);
     }
   }
 
   getPokemonName() async {
-    final response = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon'));
+    final response =
+        await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon'));
 
     _pokemonNames = (json.decode(response.body)['results'] as List)
-    .map((e) => PokemonName.fromJson(e))
-    .toList();
+        .map((e) => PokemonName.fromJson(e))
+        .toList();
 
     notifyListeners();
   }
 
   getNextUrl() async {
-    final respnse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon'));
+    final respnse =
+        await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon'));
 
     final data = NextUrl.fromJson(jsonDecode(respnse.body));
 
@@ -49,20 +54,31 @@ class PokemonProvider extends ChangeNotifier{
   }
 
   getMorePokemon(String url) async {
-    final response = await http.get(Uri.parse(url));
+    _isFetching = true;
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    final data = PokemonName.fromJson(jsonDecode(response.body));
+      List<PokemonName> names = (json.decode(response.body)['results'] as List)
+          .map((e) => PokemonName.fromJson(e))
+          .toList();
+      _nextUrls = json.decode(response.body)['next'].toString();
 
-    _pokemonNames = (json.decode(response.body)['results'] as List)
-    .map((e) => PokemonName.fromJson(e))
-    .toList();
+      _pokemonNames.addAll(names);
+      await getNextPokemonDetail(names);
 
+    } catch (e) {
+      print('gagal get more : $e');
+    }
+
+    print('masuk sini');
+    _isFetching = false;
     notifyListeners();
   }
 
-  getPokemonDetail() async {
+  getFirstPokemonDetail() async {
     for (var pokemon in _pokemonNames) {
-      final response = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/'+pokemon.name));
+      final response = await http
+          .get(Uri.parse('https://pokeapi.co/api/v2/pokemon/' + pokemon.name));
 
       final data = Pokemon.fromJson(json.decode(response.body));
       _pokemons.add(data);
@@ -70,4 +86,14 @@ class PokemonProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  getNextPokemonDetail(List<PokemonName> names) async {
+    for (var pokemon in names) {
+      final response = await http
+          .get(Uri.parse('https://pokeapi.co/api/v2/pokemon/' + pokemon.name));
+
+      final data = Pokemon.fromJson(json.decode(response.body));
+      _pokemons.add(data);
+    }
+    notifyListeners();
+  }
 }

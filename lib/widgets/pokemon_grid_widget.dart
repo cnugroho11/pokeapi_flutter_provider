@@ -12,7 +12,6 @@ class PokemonGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isScrollEnd = false;
 
     SizeConfig().init(context);
     final pokemonData = Provider.of<PokemonProvider>(context);
@@ -23,13 +22,13 @@ class PokemonGridWidget extends StatelessWidget {
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollNotification) {
         if (scrollNotification is ScrollEndNotification &&
-            scrollNotification.metrics.extentAfter == 0) {
-            
+            scrollNotification.metrics.extentAfter == 0 && !pokemonData.isFetching) {
+          pokemonData.getMorePokemon(pokemonData.nextUrls);
+          print(pokemonData.nextUrls);
           print('habis');
-          isScrollEnd = true;
-          return isScrollEnd;
+          return true;
         }
-        return isScrollEnd;
+        return false;
       },
       child: GridView.builder(
         padding: EdgeInsets.only(left: 10, right: 10, top: sizeVertical * 2),
@@ -40,11 +39,6 @@ class PokemonGridWidget extends StatelessWidget {
             childAspectRatio: 1),
         itemCount: pokemonDetail.length,
         itemBuilder: (context, index) {
-          if(isScrollEnd) {
-
-            pokemonData.getPokemonDetail();
-            print(pokemonData.nextUrls);
-          } 
           return GestureDetector(
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
